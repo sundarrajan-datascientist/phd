@@ -43,7 +43,7 @@ WITH monthly_performance AS (
         FROM mf200.performance_momentum_features_v3_nifty500 p
 
         WHERE p.trade_date >= DATE '2019-01-01'
-          AND p.trade_date <  DATE '2024-01-01'
+          AND p.trade_date <  DATE '2026-01-01'
     ) x
 
     WHERE rn = 1
