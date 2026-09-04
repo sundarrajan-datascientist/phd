@@ -1,0 +1,128 @@
+DROP TABLE IF EXISTS mf200.crisil_nifty500_month_end;
+
+CREATE TABLE mf200.crisil_nifty500_month_end AS
+WITH ranked AS (
+    SELECT
+        m.fund_id,
+        r."schemeName" AS scheme_name,
+        r.category_name,
+        r.subcategory_name,
+
+        r.report_date,
+        r."navDirect",
+        r."dailyAUM",
+        r."return1MonthDirect",
+        r."return1MonthBenchmark",
+        r."preMonthAUM",
+        r."preMonthAvgAUM",
+
+        r."ir1YrDirect",
+        r."ir3YrDirect",
+        r."ir5YrDirect",
+        r."ir10YrDirect",
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                r."schemeName",
+                DATE_TRUNC('month', r.report_date)
+            ORDER BY r.report_date DESC
+        ) AS rn
+
+    FROM mf200.crisil_fund_daily_raw r
+    INNER JOIN mf200.crisil_nifty500_fund_master m
+        ON m.scheme_name = r."schemeName"
+
+    WHERE r.benchmark = 'Nifty 500 TRI'
+)
+
+SELECT
+    fund_id,
+    scheme_name,
+    category_name,
+    subcategory_name,
+
+    report_date AS trade_month_end,
+
+    "navDirect" AS month_end_nav,
+    "dailyAUM" AS month_end_aum,
+
+    "return1MonthDirect" AS return_1m_direct,
+    "return1MonthBenchmark" AS return_1m_benchmark,
+
+    "preMonthAUM" AS pre_month_aum,
+    "preMonthAvgAUM" AS pre_month_avg_aum,
+
+    "ir1YrDirect" AS ir_1yr_direct,
+    "ir3YrDirect" AS ir_3yr_direct,
+    "ir5YrDirect" AS ir_5yr_direct,
+    "ir10YrDirect" AS ir_10yr_direct
+
+FROM ranked
+WHERE rn = 1;
+
+
+
+DROP TABLE IF EXISTS mf200.crisil_nifty500_month_end;
+
+CREATE TABLE mf200.crisil_nifty500_month_end AS
+WITH ranked AS (
+    SELECT
+        m.fund_id,
+        r."schemeName" AS scheme_name,
+        r.category_name,
+        r.subcategory_name,
+
+        -- Calendar month
+        DATE_TRUNC('month', r.report_date)::date AS month_date,
+
+        -- Actual latest CRISIL observation for this fund in this month
+        r.report_date AS trade_month_end,
+
+        r."navDirect" AS month_end_nav,
+        r."dailyAUM" AS month_end_aum,
+
+        r."return1MonthDirect" AS return_1m_direct,
+        r."return1MonthBenchmark" AS return_1m_benchmark,
+
+        r."preMonthAUM" AS pre_month_aum,
+        r."preMonthAvgAUM" AS pre_month_avg_aum,
+
+        r."ir1YrDirect" AS ir_1yr_direct,
+        r."ir3YrDirect" AS ir_3yr_direct,
+        r."ir5YrDirect" AS ir_5yr_direct,
+        r."ir10YrDirect" AS ir_10yr_direct,
+
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                m.fund_id,
+                DATE_TRUNC('month', r.report_date)
+            ORDER BY r.report_date DESC
+        ) AS rn
+
+    FROM mf200.crisil_fund_daily_raw r
+
+    INNER JOIN mf200.crisil_nifty500_fund_master m
+        ON m.scheme_name = r."schemeName"
+
+    WHERE r.benchmark = 'Nifty 500 TRI'
+)
+
+SELECT
+    fund_id,
+    scheme_name,
+    category_name,
+    subcategory_name,
+    month_date,
+    trade_month_end,
+    month_end_nav,
+    month_end_aum,
+    return_1m_direct,
+    return_1m_benchmark,
+    pre_month_aum,
+    pre_month_avg_aum,
+    ir_1yr_direct,
+    ir_3yr_direct,
+    ir_5yr_direct,
+    ir_10yr_direct
+FROM ranked
+WHERE rn = 1;
