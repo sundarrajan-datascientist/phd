@@ -1,7 +1,7 @@
 """Create one monthly return record per fund from daily rolling-return rows.
 
 The input is ``crisil_fund_rolling_30d_returns`` produced by
-``02_load_crisil_monthly_returns.py``. For each fund/calendar month, this
+``02_load_mf_monthly_returns.py``. For each fund/calendar month, this
 script retains the last available daily return row. No return calculation is
 performed here.
 """

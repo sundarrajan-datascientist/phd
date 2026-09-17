@@ -15,8 +15,8 @@ from sqlalchemy import URL, create_engine, text
 
 
 DEFAULT_SCHEMA = "mf200"
-SOURCE_TABLE = "investing_nifty500_tri_monthly"
-DEFAULT_TARGET_TABLE = "nifty500_tri_monthly_benchmark_returns"
+SOURCE_TABLE = "investing_nifty500_tri_monthly_2006"
+DEFAULT_TARGET_TABLE = "nifty500_tri_monthly_benchmark_returns_2006"
 BENCHMARK_NAME = "Nifty 500 TRI"
 
 

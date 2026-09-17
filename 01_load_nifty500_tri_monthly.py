@@ -15,9 +15,10 @@ import pandas as pd
 from sqlalchemy import URL, create_engine, text
 
 
-DEFAULT_CSV = Path("data/Nifty 500 TRI Historical Monthly Data.csv")
+#DEFAULT_CSV = Path("data/Nifty 500 TRI Historical Monthly Data.csv")
+DEFAULT_CSV = Path("data/Nifty 500 TRI Historical Data_2006_092026.csv")
 DEFAULT_SCHEMA = "mf200"
-DEFAULT_TABLE = "investing_nifty500_tri_monthly"
+DEFAULT_TABLE = "investing_nifty500_tri_monthly_2006"
 
 
 def quote_identifier(identifier: str) -> str:
@@ -54,7 +55,7 @@ def read_source(csv_path: Path) -> list[dict]:
     if missing_columns:
         raise ValueError(f"CSV is missing required columns: {sorted(missing_columns)}")
 
-    source_date = pd.to_datetime(frame["Date"], format="%d/%m/%Y")
+    source_date = pd.to_datetime(frame["Date"], format="%d-%m-%Y")
     result = pd.DataFrame(
         {
             # Source dates are day/month/year (for example, 01/07/2026).

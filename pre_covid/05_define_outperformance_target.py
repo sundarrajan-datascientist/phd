@@ -25,12 +25,34 @@ import os
 
 import pandas as pd
 from sqlalchemy import URL, create_engine, text
+from pathlib import Path
 
+RUN_TIMESTAMP_FILE = Path("D:\\PycharmProjects\\mf-ml\\run_timestamp.txt")
+
+if not RUN_TIMESTAMP_FILE.exists():
+    raise FileNotFoundError(
+        f"Run timestamp file not found: {RUN_TIMESTAMP_FILE.resolve()}"
+    )
+
+RUN_TIMESTAMP = RUN_TIMESTAMP_FILE.read_text().strip()
+
+if not RUN_TIMESTAMP:
+    raise ValueError("run_timestamp.txt is empty")
+
+print("Run timestamp:", RUN_TIMESTAMP)
+
+MF_SCHEMA = "mf100"
+
+FUND_RETURNS_TABLE = f"mf_fund_monthly_return_rows_{RUN_TIMESTAMP}"
+
+DEFAULT_TARGET_TABLE = (
+    f"fund_monthly_outperformance_targets{RUN_TIMESTAMP}"
+)
 
 DEFAULT_SCHEMA = "mf200"
-FUND_RETURNS_TABLE = "crisil_fund_monthly_return_rows"
-BENCHMARK_RETURNS_TABLE = "nifty500_tri_monthly_benchmark_returns"
-DEFAULT_TARGET_TABLE = "fund_monthly_outperformance_targets"
+# FUND_RETURNS_TABLE = "crisil_fund_monthly_return_rows"
+BENCHMARK_RETURNS_TABLE = "nifty500_tri_monthly_benchmark_returns_2006"
+# DEFAULT_TARGET_TABLE = "fund_monthly_outperformance_targets"
 
 
 def quote_identifier(identifier: str) -> str:
@@ -55,10 +77,10 @@ def build_engine():
 
 
 def read_returns(
-    engine, schema: str, fund_returns_table: str, benchmark_returns_table: str
+    engine, schema: str,mfschema: str, fund_returns_table: str, benchmark_returns_table: str
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Read the existing fund and benchmark monthly returns."""
-    fund_source = f"{quote_identifier(schema)}.{quote_identifier(fund_returns_table)}"
+    fund_source = f"{quote_identifier(mfschema)}.{quote_identifier(fund_returns_table)}"
     benchmark_source = (
         f"{quote_identifier(schema)}.{quote_identifier(benchmark_returns_table)}"
     )
@@ -346,6 +368,7 @@ def write_targets(engine, schema: str, target_table: str, targets: pd.DataFrame)
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--schema", default=os.getenv("SCHEMA", DEFAULT_SCHEMA))
+    parser.add_argument("--mfschema", default=os.getenv("MFSCHEMA", MF_SCHEMA))
     parser.add_argument("--fund-returns-table", default=FUND_RETURNS_TABLE)
     parser.add_argument("--benchmark-returns-table", default=BENCHMARK_RETURNS_TABLE)
     parser.add_argument("--target-table", default=os.getenv("TABLE", DEFAULT_TARGET_TABLE))
@@ -353,7 +376,7 @@ def main() -> int:
 
     engine = build_engine()
     fund_returns, benchmark_returns = read_returns(
-        engine, args.schema, args.fund_returns_table, args.benchmark_returns_table
+        engine, args.schema, args.mfschema, args.fund_returns_table, args.benchmark_returns_table
     )
     print(
         "Loaded "

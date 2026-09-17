@@ -9,7 +9,7 @@ import unittest
 import pandas as pd
 
 
-SCRIPT_PATH = Path(__file__).with_name("02_load_crisil_monthly_returns.py")
+SCRIPT_PATH = Path(__file__).with_name("02_load_mf_monthly_returns.py")
 SPEC = importlib.util.spec_from_file_location("monthly_returns_loader", SCRIPT_PATH)
 assert SPEC is not None and SPEC.loader is not None
 loader = importlib.util.module_from_spec(SPEC)

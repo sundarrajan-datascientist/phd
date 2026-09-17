@@ -13,11 +13,33 @@ import os
 
 import pandas as pd
 from sqlalchemy import URL, create_engine, text
+from pathlib import Path
 
+RUN_TIMESTAMP_FILE = Path("D:\\PycharmProjects\\mf-ml\\run_timestamp.txt")
 
-DEFAULT_SCHEMA = "mf200"
-SOURCE_TABLE = "crisil_fund_rolling_30d_returns"
-DEFAULT_TARGET_TABLE = "crisil_fund_monthly_return_rows"
+if not RUN_TIMESTAMP_FILE.exists():
+    raise FileNotFoundError(
+        f"Run timestamp file not found: {RUN_TIMESTAMP_FILE.resolve()}"
+    )
+
+RUN_TIMESTAMP = RUN_TIMESTAMP_FILE.read_text().strip()
+
+if not RUN_TIMESTAMP:
+    raise ValueError("run_timestamp.txt is empty")
+
+print("Run timestamp:", RUN_TIMESTAMP)
+
+DEFAULT_SCHEMA = "mf100"
+
+SOURCE_TABLE = f"mf_fund_rolling_30d_returns_{RUN_TIMESTAMP}"
+
+DEFAULT_TARGET_TABLE = (
+    f"mf_fund_monthly_return_rows_{RUN_TIMESTAMP}"
+)
+
+# DEFAULT_SCHEMA = "mf200"
+# SOURCE_TABLE = "crisil_fund_rolling_30d_returns"
+# DEFAULT_TARGET_TABLE = "crisil_fund_monthly_return_rows"
 
 
 def quote_identifier(identifier: str) -> str:

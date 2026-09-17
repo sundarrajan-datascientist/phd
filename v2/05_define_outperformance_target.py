@@ -9,7 +9,7 @@ month t, their one-month-ahead target is
                   0  otherwise.
 
 This script applies that strict comparison to the monthly fund-return rows
-created by ``03_load_crisil_monthly_returns.py`` and the Nifty 500 TRI
+created by ``03_load_mf_monthly_returns.py`` and the Nifty 500 TRI
 benchmark returns created by ``04_load_nifty500_tri_benchmark_returns.py``.
 The resulting ``month_date`` is the feature/signal month and ``target_month``
 is the following realized-return month.  The paper uses a Chinese equity-fund
